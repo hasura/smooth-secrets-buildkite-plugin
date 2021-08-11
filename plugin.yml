@@ -1,0 +1,23 @@
+name: Smooth Secrets
+description: Plugin to manage your secrets
+author: https://github.com/hasura
+requirements: []
+configuration:
+  properties:
+    secrets:
+      type: object
+      properties:
+        strategy:
+          type: string
+        key:
+          type: string
+        type:
+          type: string
+        region:
+          type: string
+      required:
+        - strategy
+        - key
+  required:
+    - secrets
+  additionalProperties: false
