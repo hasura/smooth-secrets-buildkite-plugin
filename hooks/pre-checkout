@@ -17,7 +17,7 @@ setup_ssh_agent() {
 }
 
 SECRETS_DIR="/etc/buildkite-agent/buildkite-secrets/${BUILDKITE_BUILD_ID}/${BUILDKITE_JOB_ID}"
-export "${SECRETS_DIR}"
+export SECRETS_DIR
 mkdir -p "${SECRETS_DIR}"
 setup_ssh_agent
 
