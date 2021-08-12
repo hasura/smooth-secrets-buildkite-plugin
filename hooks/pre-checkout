@@ -61,7 +61,7 @@ while true; do
   echo "Adding key to ssh-agent"
   ssh-add "${ssh_key_file}"
 
-  ((i++))
+  $((i++))
 done
 echo "Secrets configured."
 
