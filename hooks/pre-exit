@@ -2,8 +2,13 @@
 
 set -eo pipefail
 
-echo "Cleaning up secrets directory"
+echo "--- Cleaning up secrets"
+echo "Removing SSH keys from ssh-agent"
+for file in "${SSH_KEY_FILES[@]}"; do
+  ssh-add -d "$file"
+done
+echo "SSH keys removed."
+
+echo "Removing secrets directory"
 [ -d "${SECRETS_DIR}" ] && rm -r "${SECRETS_DIR}"
 echo "Secrets directory removed."
-
-eval $(ssh-agent -k)
