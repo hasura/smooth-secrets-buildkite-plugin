@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 
 set -eo pipefail
+set -Eo functrace
+
+report_error() {
+  echo error on line: "$1"
+  echo failed command: "$2"
+}
+trap 'report_error ${LINENO} ${BASH_COMMAND}' ERR
 
 get_indirected_env() {
   local index="$1"
