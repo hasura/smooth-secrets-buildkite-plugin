@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -eo pipefail
+
 get_indirected_env() {
   local index="$1"
   local env_name="$2"
@@ -10,7 +12,7 @@ get_indirected_env() {
 
 setup_ssh_agent() {
   if [ -z "${SSH_AGENT_PID}" ]; then
-    eval "$(ssh-agent -a)"
+    eval "$(ssh-agent -s)"
   fi
 }
 
@@ -24,7 +26,7 @@ while true; do
 
   if [ -z "$strategy" ]; then
     break
-  elif [ "$strategy" != "aws" ]; then
+  elif [ "$strategy" != "aws-secrets-manager" ]; then
     echo "Strategy \"${strategy}\" not supported"
     exit 1
   fi
