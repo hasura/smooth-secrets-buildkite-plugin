@@ -23,6 +23,32 @@ setup_ssh_agent() {
   fi
 }
 
+aws_strategy() {
+  local index="$1"
+  local secret_key="$(get_indirected_env "$index" "KEY")"
+  local secret_type="$(get_indirected_env "$index" "TYPE")"
+  local region="$(get_indirected_env "$index" "REGION")"
+
+  echo "Loading secret with key \"${secret_key}\""
+
+  case "${secret_type}" in
+    "ssh")
+      echo "Fetching secret from secrets manager"
+      ssh_key="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString' | base64 -d)"
+      ssh_key_file="${SECRETS_DIR}"/"${secret_key/\//\-}" # replace "/" in secret_key with "-"
+      touch "${ssh_key_file}"
+      chmod 0600 "${ssh_key_file}"
+      echo "$ssh_key" >> "${ssh_key_file}"
+      echo "Adding key to ssh-agent"
+      ssh-add "${ssh_key_file}"
+      ;;
+    *)
+      echo "Secret type \"${secret_type}\" not supported"
+      exit 1
+      ;;
+  esac
+}
+
 SECRETS_DIR="/etc/buildkite-agent/buildkite-secrets/${BUILDKITE_BUILD_ID}/${BUILDKITE_JOB_ID}"
 export SECRETS_DIR
 mkdir -p "${SECRETS_DIR}"
@@ -34,35 +60,19 @@ while true; do
   strategy="$(get_indirected_env "$i" "STRATEGY")"
 
   if [ -z "$strategy" ]; then
-    break
-  elif [ "$strategy" != "aws-secrets-manager" ]; then
-    echo "Strategy \"${strategy}\" not supported"
-    exit 1
+    echo "Secrets configured."
+    exit 0
   fi
 
-  secret_key="$(get_indirected_env "$i" "KEY")"
-  secret_type="$(get_indirected_env "$i" "TYPE")"
-  region="$(get_indirected_env "$i" "REGION")"
-
-  echo "Loading secret with key \"${secret_key}\""
-
-  if [ "${secret_type}" != "ssh" ]; then
-    echo "Secret type \"${secret_type}\" not supported"
-    exit 1
-  fi
-
-  echo "Fetching secret from secrets manager"
-  ssh_key="$(aws secretsmanager get-secret-value --secret-id ${secret_key} --region ${region} | jq -r '.SecretString' | base64 -d)"
-  ssh_key_file="${SECRETS_DIR}"/"${secret_key/\//\-}" # replace "/" in secret_key with "-"
-  touch "${ssh_key_file}"
-  chmod 0600 "${ssh_key_file}"
-  echo "$ssh_key" >> "${ssh_key_file}"
-
-  echo "Adding key to ssh-agent"
-  ssh-add "${ssh_key_file}"
+  case "$strategy" in
+    "aws-secrets-manager")
+      aws_strategy "$i"
+      ;;
+    *)
+      echo "Strategy \"${strategy}\" not supported"
+      exit 1
+      ;;
+  esac
 
   i=$((i+=1))
 done
-echo "Secrets configured."
-
-ssh-add -l
