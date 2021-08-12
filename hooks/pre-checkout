@@ -1,5 +1,54 @@
 #!/usr/bin/env bash
 
-echo "${BUILDKITE_PLUGIN_SMOOTH_SECRETS_SECRETS}"
-echo "${BUILDKITE_PLUGIN_SMOOTH_SECRETS_SECRETS[@]}"
-printenv
+get_indirected_env() {
+  local index="$1"
+  local env_name="$2"
+
+  env_ref="BUILDKITE_PLUGIN_SMOOTH_SECRETS_SECRETS_${index}_${env_name}"
+  echo "${!env_ref}"
+}
+
+setup_ssh_agent() {
+  if [ -z "${SSH_AGENT_PID}" ]; then
+    eval "$(ssh-agent -a)"
+  fi
+}
+
+SECRETS_DIR="/etc/buildkite-agent/buildkite-secrets/${BUILDKITE_BUILD_ID}/${BUILDKITE_JOB_ID}/"
+mkdir -p "${SECRETS_DIR}"
+setup_ssh_agent
+
+i=0
+while true; do
+  strategy="$(get_indirected_env "$i" "strategy")"
+
+  if [ -z "$strategy" ]; then
+    break
+  elif [ "$strategy" != "aws" ]; then
+    echo "Strategy \"${strategy}\" not supported"
+    exit 1
+  fi
+
+  secret_key="$(get_indirected_env "$i" "key")"
+  secret_type="$(get_indirected_env "$i" "type")"
+  region="$(get_indirected_env "$i" "region")"
+
+  echo "Loading secret with key \"${secret_key}\""
+
+  if [ "${secret_type}" != "ssh" ]; then
+    echo "Secret type \"${secret_type}\" not supported"
+    exit 1
+  fi
+
+  echo "Fetching secret from secrets manager"
+  ssh_key="$(aws secretsmanager get-secret-value --secret-id ${secret_key} --region ${region} | jq -r '.SecretString' | base64 -d)"
+  ssh_key_file="${SECRETS_DIR}"/"${secret_key}"
+  echo "$ssh_key" >> "${ssh_key_file}"
+
+  echo "Adding key to ssh-agent"
+  ssh-add "${ssh_key_file}"
+
+  ((i++))
+done
+
+ssh-add -l
