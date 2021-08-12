@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+echo "Cleaning up secrets directory"
+[ -d "${SECRETS_DIR}" ] && rm -r "${SECRETS_DIR}"
+echo "Secrets directory removed."
+
+eval $(ssh-agent -k)

@@ -17,6 +17,7 @@ setup_ssh_agent() {
 }
 
 SECRETS_DIR="/etc/buildkite-agent/buildkite-secrets/${BUILDKITE_BUILD_ID}/${BUILDKITE_JOB_ID}"
+export "${SECRETS_DIR}"
 mkdir -p "${SECRETS_DIR}"
 setup_ssh_agent
 
@@ -46,6 +47,8 @@ while true; do
   echo "Fetching secret from secrets manager"
   ssh_key="$(aws secretsmanager get-secret-value --secret-id ${secret_key} --region ${region} | jq -r '.SecretString' | base64 -d)"
   ssh_key_file="${SECRETS_DIR}"/"${secret_key/\//\-}" # replace "/" in secret_key with "-"
+  touch "${ssh_key_file}"
+  chmod 0600 "${ssh_key_file}"
   echo "$ssh_key" >> "${ssh_key_file}"
 
   echo "Adding key to ssh-agent"
