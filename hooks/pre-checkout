@@ -56,6 +56,6 @@ while true; do
 
   ((i++))
 done
-"Secrets configured."
+echo "Secrets configured."
 
 ssh-add -l
