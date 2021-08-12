@@ -21,8 +21,9 @@ mkdir -p "${SECRETS_DIR}"
 setup_ssh_agent
 
 i=0
+echo "--- :closed_lock_with_key: Setting up secrets"
 while true; do
-  strategy="$(get_indirected_env "$i" "strategy")"
+  strategy="$(get_indirected_env "$i" "STRATEGY")"
 
   if [ -z "$strategy" ]; then
     break
@@ -31,9 +32,9 @@ while true; do
     exit 1
   fi
 
-  secret_key="$(get_indirected_env "$i" "key")"
-  secret_type="$(get_indirected_env "$i" "type")"
-  region="$(get_indirected_env "$i" "region")"
+  secret_key="$(get_indirected_env "$i" "KEY")"
+  secret_type="$(get_indirected_env "$i" "TYPE")"
+  region="$(get_indirected_env "$i" "REGION")"
 
   echo "Loading secret with key \"${secret_key}\""
 
@@ -52,5 +53,6 @@ while true; do
 
   ((i++))
 done
+"Secrets configured."
 
 ssh-add -l
