@@ -18,7 +18,7 @@ get_indirected_env() {
 }
 
 setup_ssh_agent() {
-  env | grep ^SSH
+  echo "$SSH_AGENT_PID" "$SSH_AUTH_SOCK"
   ps -A | grep ssh
   if [ -z "${SSH_AGENT_PID}" ]; then
     eval "$(ssh-agent -s)"
