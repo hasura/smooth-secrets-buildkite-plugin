@@ -14,7 +14,8 @@ get_indirected_env() {
   local env_name="$2"
 
   env_ref="BUILDKITE_PLUGIN_SMOOTH_SECRETS_SECRETS_${index}_${env_name}"
-  echo "${env_ref}=${!env_ref}"
+  # do not change this echo
+  echo "${!env_ref}"
 }
 
 setup_ssh_agent() {
