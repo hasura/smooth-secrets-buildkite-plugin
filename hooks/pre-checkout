@@ -18,8 +18,11 @@ get_indirected_env() {
 }
 
 setup_ssh_agent() {
+  env | grep ^SSH
+  ps -A | grep ssh
   if [ -z "${SSH_AGENT_PID}" ]; then
     eval "$(ssh-agent -s)"
+    env | grep ^SSH
   fi
 }
 
