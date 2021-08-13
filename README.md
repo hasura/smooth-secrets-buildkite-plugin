@@ -25,14 +25,14 @@ secrets:
 
 ```yml
 steps:
-  command: ssh-add -l
-  plugins:
-    - hasura/smooth-secrets#v1.0.0
-        secrets:
-          - strategy: aws-secrets-manager
-            region: us-east-2
-            key: secret/id
-            type: ssh
+  - command: ssh-add -l
+    plugins:
+      - hasura/smooth-secrets#v1.0.0:
+          secrets:
+            - strategy: aws-secrets-manager
+              region: us-east-2
+              key: secret/id
+              type: ssh
 ```
 
 ## **Notes**

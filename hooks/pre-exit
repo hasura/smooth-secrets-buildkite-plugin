@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-echo "--- Cleaning up secrets"
+echo "--- :lock: Cleaning up secrets"
 echo "Killing ssh-agent with PID ${SSH_AGENT_PID}"
 eval "$(ssh-agent -k)"
 echo "Removing secrets directory: ${SECRETS_DIR}"

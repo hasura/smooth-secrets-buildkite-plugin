@@ -15,6 +15,11 @@ get_indirected_env() {
 
   env_ref="BUILDKITE_PLUGIN_SMOOTH_SECRETS_SECRETS_${index}_${env_name}"
   # do not change this echo
+  env_value="${!env_ref}"
+  if [ -z "${env_value}" ]; then
+    echo "Empty ${env_name} field; exiting"
+    exit 1
+  fi
   echo "${!env_ref}"
 }
 
@@ -32,7 +37,7 @@ aws_strategy() {
 
   case "${secret_type}" in
     "ssh")
-      echo "Fetching secret from secrets manager"
+      echo "Fetching secret from AWS secrets manager"
       ssh_key="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString' | base64 -d)"
 
       ssh_key_file="${SECRETS_DIR}"/"${secret_key/\//\-}" # replace "/" in secret_key with "-"
@@ -61,21 +66,19 @@ declare -a SSH_KEY_FILES
 export SSH_KEY_FILES
 
 i=0
-echo "--- :closed_lock_with_key: Setting up secrets"
+echo "--- :key: Setting up secrets"
 while true; do
   strategy="$(get_indirected_env "$i" "STRATEGY")"
 
-  if [ -z "$strategy" ]; then
-    break
-  fi
-
   case "$strategy" in
+    "")
+      break
+      ;;
     "aws-secrets-manager")
       aws_strategy "$i"
       ;;
     *)
-      echo "Strategy \"${strategy}\" not supported"
-      exit 1
+      echo "Invalid strategy field(${strategy}); skipping"
       ;;
   esac
 
