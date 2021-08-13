@@ -17,8 +17,12 @@ get_indirected_env() {
   # do not change this echo
   env_value="${!env_ref}"
   if [ -z "${env_value}" ]; then
-    echo "Empty ${env_name} field; exiting"
-    exit 1
+    if [ "${env_name}" = "STRATEGY" ]; then
+      echo ""
+    else
+      echo "Empty ${env_name} field; exiting"
+      exit 1
+    fi
   fi
   echo "${!env_ref}"
 }
