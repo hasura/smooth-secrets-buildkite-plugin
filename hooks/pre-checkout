@@ -70,8 +70,7 @@ while true; do
   strategy="$(get_indirected_env "$i" "STRATEGY")"
 
   if [ -z "$strategy" ]; then
-    echo "Secrets configured."
-    exit 0
+    break
   fi
 
   case "$strategy" in
@@ -86,3 +85,5 @@ while true; do
 
   i=$((i+=1))
 done
+
+echo "Secrets configured."
