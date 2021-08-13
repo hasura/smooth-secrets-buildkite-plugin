@@ -14,16 +14,11 @@ get_indirected_env() {
   local env_name="$2"
 
   env_ref="BUILDKITE_PLUGIN_SMOOTH_SECRETS_SECRETS_${index}_${env_name}"
-  echo "${!env_ref}"
+  echo "${env_ref}=${!env_ref}"
 }
 
 setup_ssh_agent() {
-  echo "$SSH_AGENT_PID" "$SSH_AUTH_SOCK"
-  ps -A | grep ssh
-  if [ -z "${SSH_AGENT_PID}" ]; then
-    eval "$(ssh-agent -s)"
-    env | grep ^SSH
-  fi
+  eval "$(ssh-agent -s)"
 }
 
 aws_strategy() {

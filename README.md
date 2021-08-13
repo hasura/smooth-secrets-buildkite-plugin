@@ -39,6 +39,5 @@ steps:
 - This plugin does not take care of any kind of authentication with the secrets manager.
 - The ssh private key is stored in directory `/etc/buildkite-agent/buildkite-secrets/${BUILDKITE_BUILD_ID}/${BUILDKITE_JOB_ID}`. 
 The filename is the `key` field value with any `/` replaced with `-`.
-- The key is added to an already running `ssh-agent`, otherwise a new `ssh-agent` is created. 
-In the `pre-exit` hook the key is removed from the `ssh-agent` but the `ssh-agent` is not killed even if it was created by the plugin.
-- The secrets directory is removed in the `pre-exit` hook.
+- The keys are added to a newly created `ssh-agent`, which is killed at the end of the job in `pre-exit` hook. 
+- The secrets directory is also removed in the `pre-exit` hook.
