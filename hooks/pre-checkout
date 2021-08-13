@@ -33,9 +33,11 @@ setup_ssh_agent() {
 
 aws_strategy() {
   local index="$1"
-  local secret_key="$(get_indirected_env "$index" "KEY")"
-  local secret_type="$(get_indirected_env "$index" "TYPE")"
-  local region="$(get_indirected_env "$index" "REGION")"
+
+  local secret_key secret_type region
+  secret_key="$(get_indirected_env "$index" "KEY")"
+  secret_type="$(get_indirected_env "$index" "TYPE")"
+  region="$(get_indirected_env "$index" "REGION")"
 
   echo "Loading secret with key \"${secret_key}\""
 
