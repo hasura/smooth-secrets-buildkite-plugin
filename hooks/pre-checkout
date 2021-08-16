@@ -60,7 +60,8 @@ aws_strategy() {
       secret_value="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString' | base64 -d)"
       secret_name="$(get_indirected_env "$index" "NAME")"
       echo "Exporting to environment"
-      export "${env_name}"="${env_value}"
+      export "${secret_name}"="${secret_value}"
+      ;;
     *)
       echo "Invalid secret type \"${secret_type}\"; skipping"
       ;;
