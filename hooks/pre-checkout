@@ -39,7 +39,7 @@ aws_strategy() {
   secret_type="$(get_indirected_env "$index" "TYPE")"
   region="$(get_indirected_env "$index" "REGION")"
 
-  echo "Loading secret with key \"${secret_key}\""
+  echo "Loading secret; type: ${secret_type}; key: ${secret_key}"
 
   case "${secret_type}" in
     "ssh")
@@ -55,9 +55,14 @@ aws_strategy() {
       echo "Adding key to ssh-agent"
       ssh-add "${ssh_key_file}"
       ;;
+    "env")
+      echo "Fetching secret from AWS secrets manager"
+      secret_value="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString' | base64 -d)"
+      secret_name="$(get_indirected_env "$index" "NAME")"
+      echo "Exporting to environment"
+      export "${env_name}"="${env_value}"
     *)
-      echo "Secret type \"${secret_type}\" not supported"
-      exit 1
+      echo "Invalid secret type \"${secret_type}\"; skipping"
       ;;
   esac
 }
