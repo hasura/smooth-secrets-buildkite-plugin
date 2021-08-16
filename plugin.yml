@@ -6,20 +6,22 @@ configuration:
   properties:
     secrets:
       type: array
-      properties:
-        strategy:
-          type: string
-        key:
-          type: string
-        type:
-          type: string
-        region:
-          type: string
-      required:
-        - strategy
-        - key
-        - type
-        - region
+      items:
+        type: object
+        properties:
+          strategy:
+            type: string
+          key:
+            type: string
+          type:
+            type: string
+          region:
+            type: string
+        required:
+          - strategy
+          - key
+          - type
+          - region
   required:
     - secrets
   additionalProperties: false
