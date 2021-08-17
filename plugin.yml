@@ -17,6 +17,8 @@ configuration:
             type: string
           region:
             type: string
+          encoding:
+            type: string
         required:
           - strategy
           - key
