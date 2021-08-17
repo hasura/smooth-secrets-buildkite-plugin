@@ -40,7 +40,7 @@ aws_strategy() {
   region="$(get_indirected_env "$index" "REGION")"
   encoding="$(get_indirected_env "$index" "ENCODING")"
 
-  if [ "${encoding}" != "base64" ]; then
+  if [ -n "${encoding}" ] && [ "${encoding}" != "base64" ]; then
     echo "Invalid encoding format \"$encoding\"; skipping"
     return 0
   fi

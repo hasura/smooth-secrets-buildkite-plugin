@@ -51,7 +51,7 @@ steps:
 
 ## **Notes**
 - This plugin does not take care of any kind of authentication with the secrets manager.
-- Unless specified expicitly with `encoding` field, `ssh` type secrets are `base64` decoded.
+- Unless specified explicitly with `encoding` field, `ssh` type secrets are `base64` decoded.
 - The ssh private key is stored in directory `/etc/buildkite-agent/buildkite-secrets/${BUILDKITE_BUILD_ID}/${BUILDKITE_JOB_ID}`. 
 The filename is the `key` field value with any `/` replaced with `-`.
 - The keys are added to a newly created `ssh-agent`, which is killed at the end of the job in `pre-exit` hook. 
