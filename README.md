@@ -1,31 +1,6 @@
 # smooth-secrets-buildkite-plugin
 A plugin to setup ssh keys and env secrets before checking out your code.
 
-## Configuration
-```yml
-secrets:
-  - strategy:
-    region:
-    key:
-    type:
-```
-
-### `secrets` (array)
-- #### `strategy` (required, string)
-    Supported value: `aws-secrets-manager`
-- #### `key` (required, string)
-    Secret id to refer to the secret in aws secrets manager
-- #### `type` (required, string)
-    Supported value: `ssh`, `env`
-    Will add the secret value as a private ssh key to the ssh-agent
-- #### `name` (string)
-    The name with which `env` type secrets will be exported.
-    Only required when the secret type is `env`
-- #### `region` (required, string)
-    Region value for aws
-- #### `encoding` (optional, string)
-    Supported value: `base64`
-
 ## Usage
 
 #### Adding an SSH key to `ssh-agent`
@@ -54,6 +29,25 @@ steps:
               name: SECRET_NAME
               type: env
 ```
+
+## Configuration
+
+### `secrets` (array)
+- #### `strategy` (required, string)
+    Supported value: `aws-secrets-manager`
+- #### `key` (required, string)
+    Secret id to refer to the secret in the secret storage.
+- #### `type` (required, string)
+    Supported value: `ssh`, `env`
+    - ssh will add the secret value as a private ssh key to the ssh-agent.
+    - env will export the env for usage in the build.
+- #### `name` (string)
+    The name with which `env` type secrets will be exported.
+    Only required when the secret type is `env`.
+- #### `region` (required, string)
+    Region value for aws
+- #### `encoding` (optional, string)
+    Supported value: `base64`
 
 ## **Notes**
 - This plugin does not take care of any kind of authentication with the secrets manager.
