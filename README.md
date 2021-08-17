@@ -16,13 +16,19 @@ secrets:
 - #### `key` (required, string)
     Secret id to refer to the secret in aws secrets manager
 - #### `type` (required, string)
-    Supported value: `ssh`  
+    Supported value: `ssh`, `env`
     Will add the secret value as a private ssh key to the ssh-agent
+- #### `name` (string)
+    The name with which `env` type secrets will be exported.
+    Only required when the secret type is `env`
 - #### `region` (required, string)
     Region value for aws
+- #### `encoding` (optional, string)
+    Supported value: `base64`
 
 ## Usage
 
+#### Adding an SSH key to `ssh-agent`
 ```yml
 steps:
   - command: ssh-add -l
@@ -35,8 +41,23 @@ steps:
               type: ssh
 ```
 
+#### Exporting secrets to environment
+```yml
+steps:
+  - command: ssh-add -l
+    plugins:
+      - hasura/smooth-secrets#v1.0.0:
+          secrets:
+            - strategy: aws-secrets-manager
+              region: us-east-2
+              key: secret/env
+              name: SECRET_NAME
+              type: env
+```
+
 ## **Notes**
 - This plugin does not take care of any kind of authentication with the secrets manager.
+- Unless specified expicitly with `encoding` field, `ssh` type secrets are `base64` decoded.
 - The ssh private key is stored in directory `/etc/buildkite-agent/buildkite-secrets/${BUILDKITE_BUILD_ID}/${BUILDKITE_JOB_ID}`. 
 The filename is the `key` field value with any `/` replaced with `-`.
 - The keys are added to a newly created `ssh-agent`, which is killed at the end of the job in `pre-exit` hook. 

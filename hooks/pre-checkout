@@ -65,8 +65,14 @@ aws_strategy() {
       echo "Fetching secret from AWS secrets manager"
       secret_value="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString')"
       [ -n "$encoding" ] && secret_value="$(echo "${secret_value}" | base64 -d)"
+
       secret_name="$(get_indirected_env "$index" "NAME")"
-      echo "Exporting to environment"
+      if [ -z "${secret_name}" ]; then
+        echo "\"name\" not provided; skipping"
+        return 0
+      fi
+
+      echo "Exporting ${secret_name} to environment"
       export "${secret_name}"="${secret_value}"
       ;;
     *)
