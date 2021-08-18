@@ -16,15 +16,16 @@ get_indirected_env() {
   env_ref="BUILDKITE_PLUGIN_SMOOTH_SECRETS_SECRETS_${index}_${env_name}"
   # do not change this echo
   env_value="${!env_ref}"
-  if [ -z "${env_value}" ]; then
-    if [ "${env_name}" = "STRATEGY" ]; then
-      echo ""
-    else
-      echo "Empty ${env_name} field; exiting"
-      exit 1
-    fi
-  fi
   echo "${!env_ref}"
+}
+
+ensure_non_empty() {
+  local env_name="$1"
+  local env_value="$2"
+  if [ -z "${env_value}" ]; then
+    echo "Empty \"${env_name}\" field; exiting"
+    exit 1
+  fi
 }
 
 setup_ssh_agent() {
@@ -39,6 +40,10 @@ aws_strategy() {
   secret_type="$(get_indirected_env "$index" "TYPE")"
   region="$(get_indirected_env "$index" "REGION")"
   encoding="$(get_indirected_env "$index" "ENCODING")"
+
+  ensure_non_empty "key" "$secret_key"
+  ensure_non_empty "type" "$secret_key"
+  ensure_non_empty "region" "$region"
 
   if [ -n "${encoding}" ] && [ "${encoding}" != "base64" ]; then
     echo "Invalid encoding format \"$encoding\"; skipping"
