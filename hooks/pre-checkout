@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+set -Eo functrace
+
+report_error() {
+  echo error on line: "$1"
+  echo failed command: "$2"
+}
+trap 'report_error ${LINENO} ${BASH_COMMAND}' ERR
+
+get_indirected_env() {
+  local index="$1"
+  local env_name="$2"
+
+  env_ref="BUILDKITE_PLUGIN_SMOOTH_SECRETS_SECRETS_${index}_${env_name}"
+  # do not change this echo
+  env_value="${!env_ref}"
+  echo "${!env_ref}"
+}
+
+ensure_non_empty() {
+  local env_name="$1"
+  local env_value="$2"
+  if [ -z "${env_value}" ]; then
+    echo "Empty \"${env_name}\" field; exiting"
+    exit 1
+  fi
+}
+
+setup_ssh_agent() {
+  eval "$(ssh-agent -s)"
+}
+
+aws_strategy() {
+  local index="$1"
+
+  local secret_key secret_type region encoding
+  secret_key="$(get_indirected_env "$index" "KEY")"
+  secret_type="$(get_indirected_env "$index" "TYPE")"
+  region="$(get_indirected_env "$index" "REGION")"
+  encoding="$(get_indirected_env "$index" "ENCODING")"
+
+  ensure_non_empty "key" "$secret_key"
+  ensure_non_empty "type" "$secret_key"
+  ensure_non_empty "region" "$region"
+
+  if [ -n "${encoding}" ] && [ "${encoding}" != "base64" ]; then
+    echo "Invalid encoding format \"$encoding\"; skipping"
+    return 0
+  fi
+
+  echo "Loading secret; type: ${secret_type}; key: ${secret_key}"
+
+  case "${secret_type}" in
+    "ssh")
+      echo "Fetching secret from AWS secrets manager"
+      ssh_key="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString' | base64 -d)"
+
+      ssh_key_file="${SECRETS_DIR}"/"${secret_key/\//\-}" # replace "/" in secret_key with "-"
+      touch "${ssh_key_file}"
+      chmod 0600 "${ssh_key_file}"
+      echo "$ssh_key" >> "${ssh_key_file}"
+      SSH_KEY_FILES+=("${ssh_key_file}")
+
+      echo "Adding key to ssh-agent"
+      ssh-add "${ssh_key_file}"
+      ;;
+    "env")
+      echo "Fetching secret from AWS secrets manager"
+      secret_value="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString')"
+      [ -n "$encoding" ] && secret_value="$(echo "${secret_value}" | base64 -d)"
+
+      secret_name="$(get_indirected_env "$index" "NAME")"
+      if [ -z "${secret_name}" ]; then
+        echo "\"name\" not provided; skipping"
+        return 0
+      fi
+
+      echo "Exporting ${secret_name} to environment"
+      export "${secret_name}"="${secret_value}"
+      ;;
+    *)
+      echo "Invalid secret type \"${secret_type}\"; skipping"
+      ;;
+  esac
+}
+
+SECRETS_DIR="/etc/buildkite-agent/buildkite-secrets/${BUILDKITE_BUILD_ID}/${BUILDKITE_JOB_ID}"
+export SECRETS_DIR
+mkdir -p "${SECRETS_DIR}"
+
+setup_ssh_agent
+
+declare -a SSH_KEY_FILES
+export SSH_KEY_FILES
+
+i=0
+echo "--- :key: Setting up secrets"
+while true; do
+  strategy="$(get_indirected_env "$i" "STRATEGY")"
+
+  case "$strategy" in
+    "")
+      break
+      ;;
+    "aws-secrets-manager")
+      aws_strategy "$i"
+      ;;
+    *)
+      echo "Invalid strategy field(${strategy}); skipping"
+      ;;
+  esac
+
+  i=$((i+=1))
+done
+
+echo "Secrets configured."

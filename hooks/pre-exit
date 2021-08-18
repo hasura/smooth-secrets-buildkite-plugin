@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+echo "--- :lock: Cleaning up secrets"
+echo "Killing ssh-agent with PID ${SSH_AGENT_PID}"
+eval "$(ssh-agent -k)"
+echo "Removing secrets directory: ${SECRETS_DIR}"
+sudo rm -rf "${SECRETS_DIR}"
+echo "Secrets directory removed."
