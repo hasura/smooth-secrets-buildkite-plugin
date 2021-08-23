@@ -105,7 +105,7 @@ SECRETS_DIR="/etc/buildkite-agent/buildkite-secrets/${BUILDKITE_BUILD_ID}/${BUIL
 export SECRETS_DIR
 mkdir -p "${SECRETS_DIR}"
 
-declare -a SECRET_FILE_PATHS
+SECRET_FILE_PATHS=()
 export SECRET_FILE_PATHS
 
 setup_ssh_agent
