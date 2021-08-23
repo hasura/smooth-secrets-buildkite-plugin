@@ -57,7 +57,7 @@ aws_strategy() {
       echo "Fetching secret from AWS secrets manager"
       ssh_key="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString' | base64 -d)"
 
-      ssh_key_file="${SECRETS_DIR}"/"${secret_key/\//\-}" # replace "/" in secret_key with "-"
+      ssh_key_file="${SECRETS_DIR}"/"${secret_key//\//\-}" # replace "/" in secret_key with "-"
       touch "${ssh_key_file}"
       chmod 0600 "${ssh_key_file}"
       echo "$ssh_key" >> "${ssh_key_file}"
@@ -84,7 +84,7 @@ aws_strategy() {
       echo "Fetching secret from AWS secrets manager"
       secret_file_content="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString')"
       [ "$encoding" == "base64" ] && secret_file_content="$(echo "${secret_file_content}" | base64 -d)"
-      secret_path="${SECRETS_DIR}/${secret_key/\//\-}"
+      secret_path="${SECRETS_DIR}/${secret_key//\//\-}"
       secret_path_env_name="$(get_indirected_env "$index" "PATH")"
 
       if [ -z "${secret_path_env_name}" ]; then
