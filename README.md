@@ -37,7 +37,7 @@ steps:
 #### Creating a file with the secret contents
 ```yml
 steps:
-  - command: ssh-add -l
+  - command: cat "${FILE_PATH_ENV_NAME}"
     plugins:
       - hasura/smooth-secrets#v1.1.0:
           secrets:
