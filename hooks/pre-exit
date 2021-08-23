@@ -9,7 +9,7 @@ echo "Removing secret files"
 while read -r file; do
   echo "Removing $file"
   sudo rm -f "$file"
-done < "${SECRET_PATHS_FILE}"
+done < "${SECRET_FILE_PATHS}"
 echo "Secret files removed."
 echo "Removing secrets directory: ${SECRETS_DIR}"
 sudo rm -rf "${SECRETS_DIR}"

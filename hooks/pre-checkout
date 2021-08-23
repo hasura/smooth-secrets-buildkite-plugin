@@ -93,7 +93,7 @@ aws_strategy() {
 
       echo "Saving secret file to path: ${secret_file_path}"
       echo "${secret_file_content}" > "${secret_file_path}"
-      echo "${secret_file_path}" >> "${SECRET_PATHS_FILE}"
+      echo "${secret_file_path}" >> "${SECRET_FILE_PATHS}"
       ;;
     *)
       echo "Invalid secret type \"${secret_type}\"; skipping"
@@ -104,9 +104,9 @@ aws_strategy() {
 SECRETS_DIR="/etc/buildkite-agent/buildkite-secrets/${BUILDKITE_BUILD_ID}/${BUILDKITE_JOB_ID}"
 export SECRETS_DIR
 mkdir -p "${SECRETS_DIR}"
-SECRET_PATHS_FILE="$SECRETS_DIR/secret_file_paths"
-export SECRET_PATHS_FILE
-touch "${SECRET_PATHS_FILE}"
+SECRET_FILE_PATHS="$SECRETS_DIR/secret_file_paths"
+export SECRET_FILE_PATHS
+touch "${SECRET_FILE_PATHS}"
 
 
 setup_ssh_agent
