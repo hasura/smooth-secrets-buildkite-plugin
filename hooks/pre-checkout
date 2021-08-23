@@ -88,7 +88,7 @@ aws_strategy() {
       secret_path_env_name="$(get_indirected_env "$index" "FILE_PATH_ENV")"
 
       if [ -z "${secret_path_env_name}" ]; then
-        echo "\"path\" not provided; skipping"
+        echo "\"file_path_env\" not provided; skipping"
         return 0
       fi
 
