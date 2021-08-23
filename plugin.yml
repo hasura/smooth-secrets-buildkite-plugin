@@ -15,6 +15,10 @@ configuration:
             type: string
           type:
             type: string
+          name:
+            type: string
+          file_path_env:
+            type: string
           region:
             type: string
           encoding:
