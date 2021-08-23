@@ -82,16 +82,17 @@ aws_strategy() {
       ;;
     "file")
       echo "Fetching secret from AWS secrets manager"
-      secret_file="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString' | base64 -d)"
+      secret_file_content="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString')"
+      [ "$encoding" == "base64" ] && secret_file_content="$(echo "${secret_file_content}" | base64 -d)"
 
       secret_file_path="$(get_indirected_env "$index" "PATH" | sed 's/ /-/g')"
-      if [ -z "${secret_file_name}" ]; then
+      if [ -z "${secret_file_path}" ]; then
         echo "\"path\" not provided; skipping"
         return 0
       fi
 
-      echo "Saving secret file to path $secret_file_path"
-      echo "${secret_file}" > "${secret_file_path}"
+      echo "Saving secret file to path: ${secret_file_path}"
+      echo "${secret_file_content}" > "${secret_file_path}"
       SECRET_FILE_PATHS+=("${secret_file_path}")
       ;;
     *)
