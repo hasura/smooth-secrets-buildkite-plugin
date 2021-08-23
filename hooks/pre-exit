@@ -5,12 +5,6 @@ set -eo pipefail
 echo "--- :lock: Cleaning up secrets"
 echo "Killing ssh-agent with PID ${SSH_AGENT_PID}"
 eval "$(ssh-agent -k)"
-echo "Removing secret files"
-while read -r file; do
-  echo "Removing $file"
-  sudo rm -f "$file"
-done < "${SECRET_FILE_PATHS}"
-echo "Secret files removed."
 echo "Removing secrets directory: ${SECRETS_DIR}"
 sudo rm -rf "${SECRETS_DIR}"
 echo "Secrets directory removed."
