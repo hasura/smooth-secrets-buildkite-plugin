@@ -80,6 +80,20 @@ aws_strategy() {
       echo "Exporting ${secret_name} to environment"
       export "${secret_name}"="${secret_value}"
       ;;
+    "file")
+      echo "Fetching secret from AWS secrets manager"
+      secret_file="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString' | base64 -d)"
+
+      secret_file_path="$(get_indirected_env "$index" "PATH" | sed 's/ /-/g')"
+      if [ -z "${secret_file_name}" ]; then
+        echo "\"path\" not provided; skipping"
+        return 0
+      fi
+
+      echo "Saving secret file to path $secret_file_path"
+      echo "${secret_file}" > "${secret_file_path}"
+      SECRET_FILE_PATHS+=("${secret_file_path}")
+      ;;
     *)
       echo "Invalid secret type \"${secret_type}\"; skipping"
       ;;
@@ -89,6 +103,9 @@ aws_strategy() {
 SECRETS_DIR="/etc/buildkite-agent/buildkite-secrets/${BUILDKITE_BUILD_ID}/${BUILDKITE_JOB_ID}"
 export SECRETS_DIR
 mkdir -p "${SECRETS_DIR}"
+
+declare -a SECRET_FILE_PATHS
+export SECRET_FILE_PATHS
 
 setup_ssh_agent
 
