@@ -8,7 +8,7 @@ A buildkite plugin to setup ssh keys and env secrets for your pipelines :butter:
 steps:
   - command: echo "\$SECRET_NAME" > secret.txt
     plugins:
-      - hasura/smooth-secrets#v1.0.0:
+      - hasura/smooth-secrets#v1.1.0:
           secrets:
             - strategy: aws-secrets-manager
               region: us-east-2
@@ -22,7 +22,7 @@ steps:
 steps:
   - command: ssh-add -l
     plugins:
-      - hasura/smooth-secrets#v1.0.0:
+      - hasura/smooth-secrets#v1.1.0:
           secrets:
             - strategy: aws-secrets-manager
               region: us-east-2
@@ -34,13 +34,28 @@ steps:
 - The keys are added to a newly created `ssh-agent`, which is killed at the end of the job in `pre-exit` hook. 
 - The secrets directory is also removed in the `pre-exit` hook.
 
+#### Creating a file with the secret contents
+```yml
+steps:
+  - command: ssh-add -l
+    plugins:
+      - hasura/smooth-secrets#v1.1.0:
+          secrets:
+            - strategy: aws-secrets-manager
+              region: us-east-2
+              key: secret/id
+              type: file
+              file_path_env: FILE_PATH_ENV_NAME
+```
+The path at which the file is created will be exported to the environment with the name given in `file_path_env` field. For example, here, `FILE_PATH_ENV_NAME` will be set to the file path.
+
 #### Exporting base64 decoded secrets to environment
 If the secret is stored as base64 encoded value in the secret storage, then smooth-secret can automatically decode and populate such secrets via the `encoding` field.
 ```yml
 steps:
   - command: ssh-add -l
     plugins:
-      - hasura/smooth-secrets#v1.0.0:
+      - hasura/smooth-secrets#v1.1.0:
           secrets:
             - strategy: aws-secrets-manager
               region: us-east-2
@@ -58,9 +73,10 @@ steps:
 - #### `key` (required, string)
     Secret id to refer to the secret in the secret storage.
 - #### `type` (required, string)
-    Supported value: `ssh`, `env`
+    Supported value: `ssh`, `env`, `file`
     - ssh will add the secret value as a private ssh key to the ssh-agent.
     - env will export the env for usage in the build.
+    - file will create a file with the secret value as contents
 - #### `name` (string)
     The name with which `env` type secrets will be exported.
     Only required when the secret type is `env`.

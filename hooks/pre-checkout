@@ -85,7 +85,7 @@ aws_strategy() {
       secret_file_content="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString')"
       [ "$encoding" == "base64" ] && secret_file_content="$(echo "${secret_file_content}" | base64 -d)"
       secret_path="${SECRETS_DIR}/${secret_key//\//\-}"
-      secret_path_env_name="$(get_indirected_env "$index" "PATH")"
+      secret_path_env_name="$(get_indirected_env "$index" "FILE_PATH_ENV")"
 
       if [ -z "${secret_path_env_name}" ]; then
         echo "\"path\" not provided; skipping"
