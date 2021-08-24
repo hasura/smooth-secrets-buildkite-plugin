@@ -31,7 +31,7 @@ steps:
               file_path_env: FILE_PATH_ENV
               file_name_env: FILE_NAME_ENV
 ```
-The path at which the file is created will be exported to the environment with the name given in `file_path_env` field. Likewise, the file name will be exported with the name given in `file_path_env`. For example, here, `FILE_PATH_ENV` var will be set to the file path and `FILE_PATH_NAME` will be set to the filename.
+The path at which the file is created will be exported to the environment with the name given in `file_path_env` field. Likewise, the file name will be exported with the name given in `file_name_env`. For example, here, `FILE_PATH_ENV` var will be set to the file path and `FILE_NAME_ENV` will be set to the filename.
 
 #### Adding an SSH key to `ssh-agent`
 ```yml
