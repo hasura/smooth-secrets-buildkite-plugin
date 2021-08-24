@@ -19,6 +19,8 @@ configuration:
             type: string
           file_path_env:
             type: string
+          file_name_env:
+            type: string
           region:
             type: string
           encoding:
