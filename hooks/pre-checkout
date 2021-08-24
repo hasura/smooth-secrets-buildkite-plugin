@@ -84,17 +84,25 @@ aws_strategy() {
       echo "Fetching secret from AWS secrets manager"
       secret_file_content="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString')"
       [ "$encoding" == "base64" ] && secret_file_content="$(echo "${secret_file_content}" | base64 -d)"
-      secret_path="${SECRETS_DIR}/${secret_key//\//\-}"
-      secret_path_env_name="$(get_indirected_env "$index" "FILE_PATH_ENV")"
+      secret_file_name="${secret_key//\//\-}"
+      secret_file_path="${SECRETS_DIR}/${secret_file_name}"
+      secret_file_path_env="$(get_indirected_env "$index" "FILE_PATH_ENV")"
+      secret_file_name_env="$(get_indirected_env "$index" "FILE_NAME_ENV")"
 
-      if [ -z "${secret_path_env_name}" ]; then
+      if [ -z "${secret_file_path_env}" ]; then
         echo "\"file_path_env\" not provided; skipping"
         return 0
       fi
 
-      echo "Saving secret file to path: ${secret_path}"
-      echo "${secret_file_content}" > "${secret_path}"
-      export "${secret_path_env_name}"="${secret_path}"
+      if [ -z "${secret_file_name_env}" ]; then
+        echo "\"file_name_env\" not provided; skipping"
+        return 0
+      fi
+
+      echo "Saving secret file to path: ${secret_file_path}"
+      echo "${secret_file_content}" > "${secret_file_path}"
+      export "${secret_file_path_env}"="${secret_file_path}"
+      export "${secret_file_name_env}"="${secret_file_name}"
       ;;
     *)
       echo "Invalid secret type \"${secret_type}\"; skipping"

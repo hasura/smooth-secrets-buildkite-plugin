@@ -8,7 +8,7 @@ A buildkite plugin to setup ssh keys and env secrets for your pipelines :butter:
 steps:
   - command: echo "\$SECRET_NAME" > secret.txt
     plugins:
-      - hasura/smooth-secrets#v1.1.0:
+      - hasura/smooth-secrets#v1.2.0:
           secrets:
             - strategy: aws-secrets-manager
               region: us-east-2
@@ -20,24 +20,25 @@ steps:
 #### Creating a file with the secret contents
 ```yml
 steps:
-  - command: echo "\${FILE_PATH_ENV_NAME}"
+  - command: cd "$(dirname "${FILE_PATH_ENV}")" && cat "${FILE_NAME_ENV}"
     plugins:
-      - hasura/smooth-secrets#v1.1.0:
+      - hasura/smooth-secrets#v1.2.0:
           secrets:
             - strategy: aws-secrets-manager
               region: us-east-2
               key: secret/id
               type: file
-              file_path_env: FILE_PATH_ENV_NAME
+              file_path_env: FILE_PATH_ENV
+              file_name_env: FILE_NAME_ENV
 ```
-The path at which the file is created will be exported to the environment with the name given in `file_path_env` field. For example, here, `FILE_PATH_ENV_NAME` will be set to the file path.
+The path at which the file is created will be exported to the environment with the name given in `file_path_env` field. Likewise, the file name will be exported with the name given in `file_path_env`. For example, here, `FILE_PATH_ENV` var will be set to the file path and `FILE_PATH_NAME` will be set to the filename.
 
 #### Adding an SSH key to `ssh-agent`
 ```yml
 steps:
   - command: ssh-add -l
     plugins:
-      - hasura/smooth-secrets#v1.1.0:
+      - hasura/smooth-secrets#v1.2.0:
           secrets:
             - strategy: aws-secrets-manager
               region: us-east-2
@@ -55,7 +56,7 @@ If the secret is stored as base64 encoded value in the secret storage, then smoo
 steps:
   - command: ssh-add -l
     plugins:
-      - hasura/smooth-secrets#v1.1.0:
+      - hasura/smooth-secrets#v1.2.0:
           secrets:
             - strategy: aws-secrets-manager
               region: us-east-2
