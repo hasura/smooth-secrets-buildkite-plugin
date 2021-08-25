@@ -89,20 +89,16 @@ aws_strategy() {
       secret_file_path_env="$(get_indirected_env "$index" "FILE_PATH_ENV")"
       secret_file_name_env="$(get_indirected_env "$index" "FILE_NAME_ENV")"
 
-      if [ -z "${secret_file_path_env}" ]; then
-        echo "\"file_path_env\" not provided; skipping"
-        return 0
+      if [ -n "${secret_file_path_env}" ]; then
+        export "${secret_file_path_env}"="${secret_file_path}"
       fi
 
-      if [ -z "${secret_file_name_env}" ]; then
-        echo "\"file_name_env\" not provided; skipping"
-        return 0
+      if [ -n "${secret_file_name_env}" ]; then
+        export "${secret_file_name_env}"="${secret_file_name}"
       fi
 
       echo "Saving secret file to path: ${secret_file_path}"
       echo "${secret_file_content}" > "${secret_file_path}"
-      export "${secret_file_path_env}"="${secret_file_path}"
-      export "${secret_file_name_env}"="${secret_file_name}"
       ;;
     *)
       echo "Invalid secret type \"${secret_type}\"; skipping"
