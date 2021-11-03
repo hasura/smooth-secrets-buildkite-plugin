@@ -8,7 +8,7 @@ A buildkite plugin to setup ssh keys and env secrets for your pipelines :butter:
 steps:
   - command: echo "\$SECRET_NAME" > secret.txt
     plugins:
-      - hasura/smooth-secrets#v1.2.1:
+      - hasura/smooth-secrets#v1.3.0:
           secrets:
             - strategy: aws-secrets-manager
               region: us-east-2
@@ -22,7 +22,7 @@ steps:
 steps:
   - command: cd "$(dirname "${FILE_PATH_ENV}")" && cat "${FILE_NAME_ENV}"
     plugins:
-      - hasura/smooth-secrets#v1.2.1:
+      - hasura/smooth-secrets#v1.3.0:
           secrets:
             - strategy: aws-secrets-manager
               region: us-east-2
@@ -38,7 +38,7 @@ The path at which the file is created will be exported to the environment with t
 steps:
   - command: ssh-add -l
     plugins:
-      - hasura/smooth-secrets#v1.2.1:
+      - hasura/smooth-secrets#v1.3.0:
           secrets:
             - strategy: aws-secrets-manager
               region: us-east-2
@@ -56,7 +56,7 @@ If the secret is stored as base64 encoded value in the secret storage, then smoo
 steps:
   - command: ssh-add -l
     plugins:
-      - hasura/smooth-secrets#v1.2.1:
+      - hasura/smooth-secrets#v1.3.0:
           secrets:
             - strategy: aws-secrets-manager
               region: us-east-2
