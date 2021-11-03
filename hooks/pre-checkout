@@ -106,8 +106,6 @@ aws_strategy() {
   esac
 }
 
-whoami
-echo "$HOME"
 SECRETS_DIR="$HOME/buildkite-secrets/${BUILDKITE_BUILD_ID}/${BUILDKITE_JOB_ID}"
 export SECRETS_DIR
 mkdir -p "${SECRETS_DIR}"
