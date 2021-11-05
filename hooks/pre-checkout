@@ -55,7 +55,7 @@ aws_strategy() {
   case "${secret_type}" in
     "ssh")
       echo "Fetching secret from AWS secrets manager"
-      ssh_key="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString' | base64 -d)"
+      ssh_key="$(aws secretsmanager get-secret-value --secret-id "${secret_key}" --region "${region}" | jq -r '.SecretString' | base64 --decode)"
 
       ssh_key_file="${SECRETS_DIR}"/"${secret_key//\//\-}" # replace "/" in secret_key with "-"
       touch "${ssh_key_file}"
