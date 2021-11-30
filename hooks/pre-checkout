@@ -42,7 +42,7 @@ aws_strategy() {
   encoding="$(get_indirected_env "$index" "ENCODING")"
 
   ensure_non_empty "key" "$secret_key"
-  ensure_non_empty "type" "$secret_key"
+  ensure_non_empty "type" "$secret_type"
   ensure_non_empty "region" "$region"
 
   if [ -n "${encoding}" ] && [ "${encoding}" != "base64" ]; then
