@@ -5,6 +5,25 @@ set -eo pipefail
 echo "--- :lock: Cleaning up secrets"
 echo "Killing ssh-agent with PID ${SSH_AGENT_PID}"
 eval "$(ssh-agent -k)"
+
 echo "Removing secrets directory: ${SECRETS_DIR}"
-sudo rm -rf "${SECRETS_DIR}"
-echo "Secrets directory removed."
+rm -rf "${SECRETS_DIR}" || {
+  echo "Tried running: rm -rf ${SECRETS_DIR}"
+  echo "But it failed leaving the following files as residue"
+  ls -la "${SECRETS_DIR}"
+}
+
+if [ -d "${SECRETS_DIR}" ]; then
+  echo "Attempting to remove with sudo"
+  sudo -n rm -rf "${SECRETS_DIR}" || {
+    echo "Tried running: sudo -n rm -rf ${SECRETS_DIR}"
+    echo "But it failed leaving the following files as residue"
+    ls -la "${SECRETS_DIR}"
+  }
+fi
+
+if [ ! -d "${SECRETS_DIR}" ]; then
+  echo "Secrets directory removed."
+else
+  echo "Failure in cleaning up the secrets directory."
+fi
