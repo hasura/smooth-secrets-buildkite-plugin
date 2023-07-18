@@ -7,11 +7,11 @@ echo "Killing ssh-agent with PID ${SSH_AGENT_PID}"
 eval "$(ssh-agent -k)"
 
 echo "Removing secrets directory: ${SECRETS_DIR}"
-# rm -rf "${SECRETS_DIR}" || {
-#   echo "Tried running: rm -rf ${SECRETS_DIR}"
-#   echo "But it failed leaving the following files as residue"
-#   ls -la "${SECRETS_DIR}"
-# }
+rm -rf "${SECRETS_DIR}" || {
+  echo "Tried running: rm -rf ${SECRETS_DIR}"
+  echo "But it failed leaving the following files as residue"
+  ls -la "${SECRETS_DIR}"
+}
 
 if [ -d "${SECRETS_DIR}" ]; then
   echo "Attempting to remove with sudo"
