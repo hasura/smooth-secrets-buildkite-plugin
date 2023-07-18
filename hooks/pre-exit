@@ -25,5 +25,5 @@ fi
 if [ ! -d "${SECRETS_DIR}" ]; then
   echo "Secrets directory removed."
 else
-  echo "Failure in cleaning up the secrets directory"
+  echo "Failure in cleaning up the secrets directory."
 fi
